@@ -1,7 +1,13 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import "bootstrap/dist/css/bootstrap.min.css"; // This imports bootstrap css styles. You can use bootstrap or your own classes by using the className attribute in your elements.
+
+/*
+ * ChatGPT was used to create the list-group and load data for the initial coordinate (45,45)
+ * https://chat.openai.com/c/2f306a92-8aa1-4da2-9ac9-a60ba5ca75dc
+ */
 
 function App() {
-  const [location, setLocation] = useState("");
+  const [location, setLocation] = useState("45,45");
   const [forecastData, setForecastData] = useState(null);
   const [error, setError] = useState("");
 
@@ -18,12 +24,15 @@ function App() {
         throw new Error("Failed to fetch data");
       }
       const data = await response.json();
-      console.log("Received data:", data);
       setForecastData(data);
+      setLocation(`${latitude},${longitude}`);
       setError(""); // Clear any previous error messages
     } catch (error) {
       console.error("Error fetching data:", error);
-      setError("Error fetching data. Please try again later.");
+      setError(
+        "Invalid coordinate. Please enter valid latitude and longitude."
+      );
+      setForecastData(null); // Clear forecast data if an error occurs
     }
   };
 
@@ -31,11 +40,17 @@ function App() {
   const formatTime = (time) => {
     const date = new Date(time);
     return date.toLocaleTimeString("en-US", {
-      hour: "2-digit",
+      hour: "numeric",
       minute: "2-digit",
       hour12: true,
     });
   };
+
+  useEffect(() => {
+    // Load data for the initial coordinates upon component mount
+    const [latitude, longitude] = location.split(",");
+    handleSubmit(latitude.trim(), longitude.trim());
+  }, []);
 
   const handleSearch = (event) => {
     event.preventDefault();
@@ -45,7 +60,9 @@ function App() {
 
   return (
     <div className="container">
+      <br></br>
       <h1 className="text-center">Open Meteo Forecast</h1>
+      <br></br>
       <div className="row mb-3">
         <div className="col">
           <button
@@ -88,9 +105,10 @@ function App() {
       </form>
       {error && <div className="alert alert-danger mt-3">{error}</div>}
       {forecastData && (
-        <div className="row mt-4">
-          <div className="col-md-6">
-            <h2>Hour</h2>
+        <div className="row">
+          <div className="col">
+            <br></br>
+            <h3>Hourly Temperatures</h3>
             <table className="table">
               <tbody>
                 {forecastData.hourly.time.slice(0, 10).map((time, index) => (

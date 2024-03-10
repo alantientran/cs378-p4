@@ -37,11 +37,23 @@
   }
 }
 
-button {
-  padding: 8px;
+.forecast {
+  display: flex;
 }
 
-input {
-  padding: 8px;
-  outline: none;
+.column {
+  flex: 1;
+}
+
+.column h2 {
+  text-align: center;
+}
+
+.column ul {
+  list-style: none;
+  padding: 0;
+}
+
+.column ul li {
+  margin-bottom: 10px;
 }
